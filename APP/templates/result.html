@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Kết quả xử lý hình ảnh{% endblock %}
+{% block css%} 
+<link rel="stylesheet" href="../static/css/base.css"> 
+{%endblock%}
+
+{% block content %}
+<!-- Các nội dung cụ thể cho trang result -->
+
+<h1>Kết quả tìm kiếm</h1>
+{% if outputPicture %}
+<div class="result-container">
+    <div class="row d-flex justify-content-center">
+        {% for image_path in outputPicture %}
+            <div class="col-md-4 image" onclick="expandImage(true)">
+                <img class="result-image img-fluid" src="{{ url_for('static', filename=image_path) }}" alt="Image">
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+    <h4>Không tìm thấy hình ảnh của vận động viên này</h4>
+    <p>Hãy quay về trang chủ tìm kiếm bằng một số bib khác hoặc 1 hình ảnh chứa mặt của vận động viên rõ nét hơn.</p>
+{% endif %}
+
+<a href="{{ url_for('home') }}" class="btn btn-primary mt-4">Trở về trang chủ</a>
+
+
+{% endblock %}
+
+

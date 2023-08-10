@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% block title %}Trang chủ{% endblock %}
+{%block headerScript%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+{%endblock%}
+{% block css%}
+<link rel="stylesheet" href="../static/css/index.css"> {%endblock%}
+
+{% block content %}
+<!-- Search Form -->
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Tìm kiếm hình ảnh cuộc đua</h2>
+            <form action="/submit" method="post" enctype="multipart/form-data" id="searchForm">
+                <input type="hidden" id="race_name" name="race_name" required value="testMAP">
+                <div class="form-group">
+                    <label for="search_method">Cách thức tìm kiếm:</label>
+                    <div class="btn-group-toggle d-flex justify-content-between flex-wrap" data-toggle="buttons">
+                        <label class="btn btn-outline-primary active mr-md-2 my-2 search-radio-btn">
+                            <input type="radio" name="search_method" id="option_bib" value="bib" autocomplete="off" checked>
+                            Tìm kết quả chỉ chứa số Bib
+                        </label>
+                        <label class="btn btn-outline-primary mr-md-2 my-2 search-radio-btn">
+                            <input type="radio" name="search_method" id="option_face" value="face" autocomplete="off">
+                            Tìm kết quả chỉ chứa khuôn mặt
+                        </label>
+                        <label class="btn btn-outline-primary mr-md-2 my-2 search-radio-btn">
+                            <input type="radio" name="search_method" id="option_both" value="both" autocomplete="off">
+                            Tìm kết quả chỉ chứa bib hoặc khuôn mặt
+                        </label>
+                        <label class="btn btn-outline-primary mr-md-2 my-2 search-radio-btn">
+                            <input type="radio" name="search_method" id="option_and" value="and" autocomplete="off">
+                            Tìm kết quả chỉ chứa bib và khuôn mặt
+                        </label>
+                    </div>
+
+
+
+
+                    
+                </div>
+                <div class="">
+                    <h4 id="gen-text" class="mb-3">Nhập vào số bib cần tìm</h4>
+                    <div id="bib_field" class="form-group w-100">
+                        <input class="w-100 p-md-2" type="text" id="bib" name="bib" placeholder="Nhập vào số bib" onchange="handleBibChange()">
+                    </div>
+                    <div id="image_field" class="form-group d-none">
+                        <label for="image">Ảnh có chứa mặt của vận động viên:</label>
+                        <input type="file" id="image" name="image" accept="image/*" onchange="handleImageChange(event)" >
+                        
+                        <div class="d-flex m-md-4">
+                            <img id="preview" class="preview-image d-none" src="" alt="Preview">
+                        </div>
+                        
+                    </div>
+                    <p class="alert alert-danger my-2" role="alert" id="main-form-error" style="display: none;">Hãy nhập vào số bib của vận động viên cần tìm</p>
+                    <button type="button" class="btn btn-primary d-none" id="uploadImageBtn">Bắt đầu tìm</button>
+                </div>
+                <input type="hidden" id="selected_image" name="selected_image" value="">
+                <!-- <button type="submit" class="btn btn-primary" id="submitBtn" >Bắt đầu tìm</button> -->
+            </form>
+            <div class="submit-btn-container" onclick="submitForm()">
+                <div class="btn btn-primary" id="submit-button">Bắt đầu tìm</div>
+            </div>
+            <div class="submit-btn-container" onclick="submitFormOr()">
+                <div class="btn btn-primary d-none" id="submit-button-or">Bắt đầu tìm</div>
+            </div>
+        </div>
+        
+    </div>
+    <!-- show images -->
+    <div class="mt-4">
+        <div id="image-list-container" class="row"></div>
+        <div id="pagination-container" class="d-flex justify-content-center mt-5">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li id="previous-page" class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li id="first-page" class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li id="current-page" class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    <li id="last-page" class="page-item"><a class="page-link" href="#">10</a></li>
+                    <li id="next-page" class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+{%block modal%}
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document" style="min-width: 70vw;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Hãy chọn khuôn mặt bạn cần tìm</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modalImage" class="row" style="justify-content: space-evenly;"></div>
+                <div id="loadingIndicator" class="text-center" style="display: none;">
+                    <img src="../static/icon/loading.gif" alt="Loading...">
+                    <p>Loading...</p>
+                </div>
+            </div>
+            <p class="alert alert-danger my-2" role="alert" id="none-face-selected" style="display: none;">Vui lòng chọn một khuôn mặt.</p>
+
+            <div class="modal-footer">
+                <label for="image" class="btn btn-secondary" id="tryAgain-modal">Dùng hình khác</label>
+                <button type="button" class="btn btn-primary" id="submitBtn-modal" disabled>Bắt đầu tìm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}
+
+{% block scripts %}
+<script src="../static/js/index.js"></script>
+
+<script>
+function submitFormOr(){
+    var fileInput = document.getElementById('image');
+    var bibInput = document.getElementById('bib');
+    var bibValue = bibInput.value.trim()
+    var fileError = document.getElementById('main-form-error');
+    const uploadImageBtn = document.getElementById("uploadImageBtn");
+    fileError.textContent = "Hãy nhập vào số bib hoặc hình ảnh của vận động viên cần tìm"
+
+    if (bibValue === "" && fileInput.files.length <= 0){
+        fileError.style.display = 'block';
+    }
+    else{
+        fileError.style.display = 'none';
+        if (bibValue.length > 0 && fileInput.files.length > 0){
+            uploadImageBtn.click()
+        }
+        else if (bibValue.length > 0){
+            submitForm()
+        }
+        else if (fileInput.files.length > 0){
+            uploadImageBtn.click()
+        }
+    }
+
+}
+
+function submitForm(){
+    var bibInput = document.getElementById('bib');
+    var bibValue = bibInput.value.trim()
+    var fileError = document.getElementById('main-form-error');
+    fileError.textContent = "Hãy nhập vào số bib của vận động viên cần tìm"
+
+    if (bibValue === "") {
+        fileError.style.display = 'block';
+    } else {
+        fileError.style.display = 'none';
+        document.getElementById('searchForm').submit();
+    }
+}
+function handleBibChange(){
+    var bibInput = document.getElementById('bib');
+    var bibValue = bibInput.value.trim()
+    var fileError = document.getElementById('main-form-error');
+    fileError.textContent = "Hãy nhập vào số bib của vận động viên cần tìm"
+
+    if (bibValue === "") {
+        fileError.style.display = 'block';
+    } else {
+        fileError.style.display = 'none';
+    }
+}
+function handleFaceSelectChange(){
+    var fileInput = document.getElementById('image');
+    var fileError = document.getElementById('none-face-selected');
+
+    if (fileInput.files.length === 0) {
+        fileError.style.display = 'block';
+    } else {
+        fileError.style.display = 'none';
+    }
+}
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        loadImages(1);
+    });
+
+    function loadImages(page) {
+        var raceName = "{{ race_name }}";
+        //   var perPage = 24; // Số lượng hình ảnh trên mỗi trang
+
+        $.ajax({
+            url: "/load_images",
+            method: "POST",
+            data: {
+                race_name: raceName,
+                page: page
+            },
+            success: function (response) {
+                var images = response.images;
+
+                // Hiển thị danh sách hình ảnh
+                var imageListContainer = $("#image-list-container");
+                imageListContainer.empty();
+                for (var i = 0; i < images.length; i++) {
+                    var imageSrc = images[i];
+                    var imageElement = $("<img>").attr("src", imageSrc);
+                    var imageWrapper = $("<div>").addClass("col-md-3 image").append(imageElement);
+                        imageWrapper.click(function() {
+                            expandImage(true); // Gọi hàm expandImage với đối số download = true
+                        });
+                    imageListContainer.append(imageWrapper);
+                }
+
+                // Hiển thị các nút phân trang
+                var totalPages = response.totalPages;
+
+                createPaginationButtons(totalPages, page); // Gọi hàm tạo nút phân trang
+                $(".page-link").click(function (event) {
+                    var pageNumber = $(this).data("page");
+                    if (pageNumber<1){pageNumber=1;}
+                    if (pageNumber>totalPages){pageNumber=totalPages;}
+                    if(page != pageNumber){
+                        loadImages(pageNumber);
+                    }
+                    else{
+                        event.preventDefault();
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.log(error);
+            }
+        });
+    }
+
+    // Tạo nút chuyển trang
+    function createPaginationButtons(totalPages, currentPage) {
+        var paginationContainer = $("#pagination-container");
+        paginationContainer.empty();
+
+        var paginationList = $("<ul>").addClass("pagination");
+        paginationContainer.append(paginationList);
+
+        var previousPage = $("<li>").addClass("page-item");
+        var previousLink = $("<a>").addClass("page-link").attr("href", "#").attr("aria-label", "Previous").data("page", currentPage - 1);
+        previousLink.append($("<span>").attr("aria-hidden", "true").html("&laquo;"));
+        previousPage.append(previousLink);
+        paginationList.append(previousPage);
+
+        var ellipsisStart = false;
+        var ellipsisEnd = false;
+
+        // Các nút trang nằm ở giữa
+        var startPage = 1;
+        var endPage = totalPages;
+        if (totalPages > 10) {
+            if (currentPage <= 6) {
+                endPage = 10;
+            } else if (currentPage >= totalPages - 5) {
+                startPage = totalPages - 9;
+            } else {
+                startPage = currentPage - 5;
+                endPage = currentPage + 4;
+            }
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            var page = $("<li>").addClass("page-item");
+            if (i === currentPage) {
+                page.addClass("active");
+            }
+            var pageLink = $("<a>").addClass("page-link").attr("href", "#").html(i).data("page", i);
+            page.append(pageLink);
+            paginationList.append(page);
+        }
+
+        var nextPage = $("<li>").addClass("page-item");
+        var nextLink = $("<a>").addClass("page-link").attr("href", "#").attr("aria-label", "Next").data("page", currentPage + 1);
+        nextLink.append($("<span>").attr("aria-hidden", "true").html("&raquo;"));
+        nextPage.append(nextLink);
+        paginationList.append(nextPage);
+    }
+
+</script>
+{%endblock%}

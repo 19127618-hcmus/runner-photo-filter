@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}
+Upload Preview
+{% endblock %}
+{% block css%}
+<link rel="stylesheet" href="../static/css/base.css"> {%endblock%}
+
+{% block content %}
+<div class="container">
+    <h1>Các hình ảnh mới trong cuộc đua {{ race_name }}</h1>
+    <div class="row image-container">
+        {%if images%}
+        {% for image in images %}
+        <div class="col-md-4 preview-column image" onclick="expandImage(false)">
+            <img class="img-fluid preview-image" src="{{ url_for('static', filename=image) }}" alt="Image">
+        </div>
+        {% endfor %}
+        {%else%}
+        <div class="col-12 mb-4">
+            <h3>Hình bạn chọn đã nằm trong cơ sở dữ liệu, hãy tải lên hình khác.</h3>
+        </div>
+        {%endif%}
+    </div>
+    <div>
+        {%if images%}
+        <button id="processing-btn" class="btn btn-primary">Tiếp tục tải ảnh lên</button>
+        {%else%}
+        <a href="/upload"><button class="btn btn-primary">Tải lên hình khác</button></a>
+        {%endif%}
+
+    </div>
+    <!-- <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Quay về trang chủ</a> -->
+
+</div>
+{% endblock %}
+    {%block modal%}
+    <!-- Modal -->
+    <div class="modal fade" id="processingModal" tabindex="-1" role="dialog" aria-labelledby="processingModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="processingModalLabel" style="color: #28a745;">Quá trình tải ảnh lên đang
+                        được xử lý</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h5>Hình ảnh bạn tải lên đang được xử lý.<br>Bạn có thể đóng tab này hoặc quay về trang chủ.</h5>
+                    <p>Số lượng ảnh mới được thêm vào: <b id="numOfNewImage"></b> ảnh</p>
+                    <p>Thời gian dự kiến: <b id="estimatedTime"></b> giây</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url_for('home') }}" class="btn btn-primary">Quay về trang chủ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}
+{% block scripts %}
+
+<script>
+    $(document).ready(function () {
+        $("#processing-btn").click(function () {
+            $(this).hide(); // Ẩn nút "Tiếp tục tải ảnh lên"
+            $("#processingModal").modal("show");
+
+            // Gửi AJAX request để lấy thông tin về race_name và new_images
+            $.ajax({
+                url: "{{ url_for('upload_processing', race_name=race_name) }}",
+                type: "GET",
+                success: function (data) {
+                    // var raceName = data.race_name;
+                    var newImages = data.new_images;
+                    var newImagesCount = data.new_images_count;
+                    var estimatedTime = 45 + newImagesCount * 10;  // nhóm tính toán thì load model hết từ 41 tới 43s, 1 hình xử lý trung bình 4.5s -> 6s (ước tính thì mỗi thứ lấy dư 1 ít)
+                    $("#processingModal #numOfNewImage").text(newImagesCount);
+                    $("#processingModal #estimatedTime").text(estimatedTime);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

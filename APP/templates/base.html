@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {%block headerScript%}{%endblock%}
+    {% block css%}{%endblock%}
+</head>
+
+<body>
+    <div class="containe-xxlr">
+        <header class="header">
+            <!-- Navigation Bar -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="/">Trang chủ</a>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload">Tải lên hình ảnh cuộc đua</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="banner"></div>
+        </header>
+
+        <div class="body">
+            {% block content %}{% endblock %}
+        </div>
+
+        <footer class="footer mt-4">
+            <p>&copy 2023 NTT-DMN</p>
+        </footer>
+        {%block modal%}{%endblock%}
+    </div>
+
+    <script src="../static/js/base.js"></script>
+    <script>
+
+        function previewImages(event) {
+            var input = event.target;
+            var previewContainer = document.getElementById('preview-images');
+            previewContainer.innerHTML = '';
+    
+            if (input.files && input.files.length > 0) {
+                for (var i = 0; i < input.files.length; i++) {
+                    var reader = new FileReader();
+                    reader.onload = function(e){
+                        var img = document.createElement('img');
+                        img.classList.add('preview-image');
+                        img.src = e.target.result;
+                        var column = document.createElement('div');
+                        column.classList.add('preview-column', 'col-md-4', 'image');
+                        column.addEventListener('click', function() {
+                            expandImage(false);});
+                        column.appendChild(img);
+                        previewContainer.appendChild(column);
+                    };
+                    reader.readAsDataURL(input.files[i]);
+                }
+            }
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

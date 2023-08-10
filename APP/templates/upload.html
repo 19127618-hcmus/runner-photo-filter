@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Tải lên hình ảnh cuộc đua{% endblock %}
+{% block css%} <link rel="stylesheet" href="../static/css/base.css"> {%endblock%}
+{% block content %}
+<!-- Các nội dung cụ thể cho trang upload -->
+<div class="container">
+    <h1>Tải lên hình ảnh cuộc đua</h1>
+    <form action="{{ url_for('upload', race_name='') }}" method="POST" enctype="multipart/form-data" id="upload-form">
+        <div class="form-group">
+            <label for="race_name">Tên cuộc đua:</label>
+            <input type="text" class="form-control" id="race_name" name="race_name" value="testMAP" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="images">Lựa chọn hình ảnh tải lên:</label>
+            <input type="file" class="form-control-file" id="images" name="images[]" multiple accept="image/*" onchange="previewImages(event); checkFiles()" required>
+            <p class="alert alert-danger my-2" role="alert" id="file-error" style="display: none;">Vui lòng chọn ít nhất một hình ảnh.</p>
+        </div>
+        <div class="">
+                <div class="preview-container row" id="preview-images"></div>
+        </div>
+    </form>
+    
+    <div class="submit-btn-container" onclick="submitForm()" style="width: fit-content;">
+        <div class="btn btn-primary" id="submit-button">Bắt đầu tải lên</div>
+    </div>
+
+</div>
+{% endblock %}
+
+{%block scripts%}
+
+<script>
+    function checkFiles() {
+        var fileInput = document.getElementById('images');
+        var fileError = document.getElementById('file-error');
+        
+        if (fileInput.files.length > 0) {
+            fileError.style.display = 'none';
+        } else {
+            fileError.style.display = 'block';
+        }
+    }
+
+    function submitForm() {
+        var fileInput = document.getElementById('images');
+        var fileError = document.getElementById('file-error');
+
+        if (fileInput.files.length === 0) {
+            fileError.style.display = 'block';
+        } else {
+            fileError.style.display = 'none';
+            document.getElementById('upload-form').submit();
+        }
+    }
+</script>
+
+{% endblock %}

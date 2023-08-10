@@ -1,0 +1,120 @@
+p {
+    margin: 0;
+}
+.preview-column{
+    width: 300px;
+    height: 300px;
+}
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+}
+
+.row {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.col-md-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 30px;
+}
+
+.image-option {
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.selected-image {
+    border: 2px solid blue;
+}
+
+.banner {
+    height: 500px;
+    background-image: url('../image/bannerSalonpas.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.body {
+    margin: 20px 5% 20px;
+    padding: 5px;
+    min-height: calc(100vh - 500px - 60px);
+}
+
+.footer {
+    background-color: gainsboro;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+h1 {
+    margin-bottom: 40px;
+}
+button:disabled {
+    cursor: not-allowed;
+}
+
+/*  */
+.image {
+    width: 300px;
+    height: 300px;
+}
+.result-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 8px;
+}
+
+/*  */
+.image {
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .expanded-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .image-wrapper{
+    position: inherit;
+    padding: 1px;
+    border-radius: 8px;
+  }
+  .expanded-image img {
+    max-width: 100vw;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0px 0px 5px whitesmoke;
+  }
+
+  .download-button {
+    background-color: #fff;
+    color: #333;
+    padding: 10px 15px;
+    text-decoration: none !important;
+    border-radius: 5px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: 1px solid #a18fd5;
+    box-shadow: 0px 0px 4px #a596d1;
+  }
+  .download-button:hover{
+    box-shadow: none;
+  }
